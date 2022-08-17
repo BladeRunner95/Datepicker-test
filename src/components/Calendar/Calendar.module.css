@@ -1,0 +1,286 @@
+
+::-webkit-scrollbar {
+    width: 6px;
+}
+
+::-webkit-scrollbar-track {
+    margin-bottom: 2px;
+    margin-top: 2px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #c1c1c1;
+    border-radius: 3px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #888;
+}
+
+.calendarContainer {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    border-spacing: 0;
+}
+
+.title {
+    font-family: Almoni, Arial, serif;
+    color: #5d5d5f;
+    padding-bottom: 5px;
+    font-size: 19px;
+    font-weight: bold;
+}
+
+.yearMonthContainer {
+    text-align: center;
+    width: 100%;
+    margin: 0 auto;
+    padding: 0 12px;
+}
+
+.yearMonthInner {
+    display: flex;
+    text-align: center;
+    width: 100%;
+}
+
+.rightArrowBtn {
+    cursor: pointer;
+    border: 1px solid #cacaca;
+    line-height: 12px;
+    padding: 6px;
+    border-radius: 3px;
+    background-color: transparent;
+    opacity: 0.7;
+    transition-duration: 0.3s;
+}
+
+.rightArrowBtn:disabled {
+    cursor: default;
+    color: #ededed;
+    border: 1px solid #ededed;
+    pointer-events: none;
+}
+
+.rightArrowBtn:hover {
+    animation: ease-in;
+    opacity: 1;
+    border-color: #003300;
+}
+
+.arrowIcon {
+    background: url("../../assests/arrow-point-to-right.png") no-repeat center center;
+    background-size: contain;
+    padding: 8px;
+    border: none;
+}
+
+.arrowIconDisabled {
+    opacity: 0.1;
+    cursor: default;
+    pointer-events: none;
+}
+
+.leftArrowBtn {
+    transform: rotate(-180deg);
+}
+
+.pickerInputContainer {
+    font-size: 15px;
+    position: relative;
+    padding: 0 2px;
+    width: 100%;
+    display: flex;
+    white-space: nowrap;
+    margin: 0 18px;
+    border-bottom: 1px solid rgb(235, 235, 228);
+}
+
+.dropdownContainer {
+    display: flex;
+    padding: 2px 0 5px;
+    flex-direction: column;
+    align-items: flex-start;
+    top: 0;
+    box-shadow: rgba(14, 30, 37, 0.12) 0 2px 4px 0, rgba(14, 30, 37, 0.32) 0 2px 16px 0;
+    position: absolute;
+    background-color: #f6f8fa;
+    width: 100%;
+    max-height: 275px;
+    color: #757677;
+}
+
+.pickerInput {
+    color: #989898;
+    position: relative;
+    font-size: 15px;
+    line-height: 20px;
+    text-align: start;
+    cursor: pointer;
+    background: #fff;
+    border: none;
+    outline: none;
+    width: 93%;
+}
+
+.pickerInputDropdown {
+    color: inherit;
+    padding-right: 4px;
+    background-color: inherit;
+}
+
+.dropdownIcon {
+    align-self: center;
+    border-style: solid;
+    border-width: 4px 4px 0 4px;
+    border-color: #282c34 transparent transparent transparent;
+}
+
+.dropdownIconUp {
+    transform: rotate(180deg);
+}
+
+.tableContainer {
+    padding: 15px 2px 12px;
+}
+
+.tableInner {
+    display: inline-grid;
+    justify-content: center;
+    align-items: center;
+    background: #fff;
+}
+
+.weekContainer {
+    font-size: 14px;
+    display: grid;
+    justify-content: center;
+    align-items: center;
+    grid-template-columns: repeat(7, 1fr);
+    color: #999;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.weekDay {
+    width: 35px;
+    justify-self: center;
+    align-self: center;
+    text-align: center;
+}
+
+.dayHeader {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+}
+
+.dayEl {
+    cursor: pointer;
+    outline: 0;
+    border: 0;
+    font-family: "Open Sans", sans-serif;
+    font-size: 12px;
+    width: 32px;
+    height: 32px;
+    line-height: 32px;
+    border-radius: 50px;
+    margin: 2px;
+    transition-duration: .8s;
+}
+
+.dayElAvailable {
+    color: #399188;
+    background-color: #d8eaea;
+    user-select: none;
+}
+.dayElAvailable:hover {
+    animation: ease-in;
+    animation-name: punch;
+    animation-duration: 0.4s;
+    background-color: #26867d;
+    color: #d5e7e5;
+    font-size: 13px;
+    font-weight: bold;
+}
+@keyframes punch {
+    0% {
+        color: #399188;
+        background-color: #d8eaea;
+    }
+    25% {
+        font-size: 10px;
+    }
+    50% {
+        font-size: 5px;
+    }
+    75% {
+        font-size: 10px;
+        color: #399188;
+        background-color: #d8eaea;
+    }
+    100% {
+        font-size: 13px;
+        background-color: #26867d;
+        color: #d5e7e5;
+    }
+}
+
+.dayElDisabled {
+    pointer-events: none;
+    user-select: none;
+    cursor: default;
+    color: #d4d4d4;
+}
+
+.dayElSelected {
+    background-color: #26867d;
+    color: #d5e7e5;
+    font-size: 13px;
+    user-select: none;
+    font-weight: bold;
+}
+
+.openedWrapper {
+    color: black !important;
+    position: absolute;
+    width: 100%;
+}
+
+.dropdownFirstRow {
+    display: flex;
+    padding: 0 2px;
+    border-bottom: 1px solid rgb(235, 235, 228);
+}
+
+.dropdownListContainer {
+    display: flex;
+    text-align: right;
+    flex-direction: column;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    width: 98%;
+    padding: 0 4px;
+}
+
+.dropdownItem {
+    width: 100%;
+    font-size: 15px;
+    color: #757677;
+    border: none;
+    text-align: right;
+    padding: 3px 2px;
+    transition: 0.3s ease;
+    cursor: pointer;
+    background-color: transparent;
+}
+
+.dropdownItem:hover {
+    background-color: #c1c1c1;
+}
+
+.dropdownItem:disabled {
+    color: #d4d4d4;
+    background-color: transparent;
+    cursor: default;
+}

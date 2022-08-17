@@ -1,0 +1,113 @@
+* {
+    font-family: Almoni, Arial, serif;
+    box-sizing: border-box;
+}
+
+h1 {
+    font-family: Almoni, Arial, serif;
+}
+
+.inputPicker {
+    text-align: left;
+    cursor: pointer;
+}
+
+.calendarIcon {
+    width: 25px;
+    height: 92%;
+    position: absolute;
+    right: 0;
+    background: url("../../assests/calendar.png") no-repeat center center;
+    background-size: contain;
+}
+
+.mainWrap {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    flex-direction: column;
+    padding: 15px 50px;
+    direction: rtl;
+}
+
+.mainTitle {
+    padding: 16px 0;
+}
+
+.pickerContainer {
+    position: relative;
+    width: 130px;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    cursor: pointer;
+}
+
+.calendarContainer {
+    transform: translate(-50%, -15%);
+    top: 50%;
+    left: 50%;
+    position: absolute;
+    padding: 20px;
+    width: auto;
+
+}
+
+
+.calendarWrap {
+    background-color: white;
+    box-shadow: rgba(14, 30, 37, 0.12) 0 2px 4px 0, rgba(14, 30, 37, 0.32) 0 2px 16px 0;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    margin: auto;
+    cursor: default;
+
+    min-height: 390px;
+}
+
+.closeButtonContainer {
+    align-self: flex-end;
+}
+
+.closeButton {
+    align-self: flex-end;
+    width: 12px;
+    height: 12px;
+    background-image: url("../../assests/closeBut.png");
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: center center;
+    opacity: 0.6;
+}
+
+.closeButton:hover{
+    opacity: 1;
+    transition: all 0.3s ease 0s;
+}
+
+.closeButtonIcon {
+    width: 100%;
+}
+
+.startFinishContainer {
+    height: auto;
+    position: relative;
+    padding: 8px 8px;
+    display: flex;
+    flex-direction: row;
+}
+
+.calendarsBorder {
+    opacity: 0.4;
+    margin: 0 23px;
+    height: 322px;
+}
+
+.showDates {
+    position: absolute;
+    left: 50%;
+    bottom: 0;
+    transform: translate(-50%, 435px);
+}
