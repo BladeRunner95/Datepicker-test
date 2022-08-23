@@ -11,8 +11,23 @@ export const yearFromNow = (curDate) => {
     return Array.from(getRange.by('month', {step: 1}))
 };
 
+export const getDaysNumbers = (selectedDate) => {
+    let daysInMonth = moment(selectedDate).daysInMonth();
+    const arrDays = [];
+    for (let i = 1; i < daysInMonth + 1; i++) {
+        const current = moment(selectedDate).date(i);
+        arrDays.push(current);
+    }
+    return arrDays;
+}
+
 export const addMonth = (curDate) => {
   return curDate.clone().add(1, 'months');
+};
+
+export const isLastDayOfMonth = (curDate) => {
+    if (!curDate) return console.log("the date is not set yet");
+    return curDate.clone().endOf('month').isSame(curDate, 'date');
 };
 
 export const subtractMonth = (curDate) => {

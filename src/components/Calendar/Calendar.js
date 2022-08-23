@@ -1,10 +1,13 @@
 import styles from './Calendar.module.css';
 import {
     addMonth,
-    getWeeks, gridFirstDay,
+    getWeeks,
+    gridFirstDay,
     isBeforeOrSameDate,
     subtractMonth,
-    yearFromNow
+    yearFromNow,
+    getDaysNumbers,
+    isLastDayOfMonth
 } from "../../helpers/datepicker.variables";
 import {useEffect, useMemo, useState} from "react";
 import moment from 'moment';
@@ -14,53 +17,50 @@ import {dateActions} from "../../store/actions/date.actions";
 
 export const Calendar = (props) => {
     const dispatch = useDispatch();
-    const currentDate = useSelector(state => state.dateReducer);
+    const storedDate = useSelector(state => state.dateReducer);
     const [showDropdown, setShowDropdown] = useState(false);
     const [days, setDays] = useState([]);
     const [daysFinish, setDaysFinish] = useState([]);
 
 
-    const yearFromNowMemo = useMemo(() => yearFromNow(currentDate.dateNow), [currentDate.dateNow]);
+    const yearFromNowMemo = useMemo(() => yearFromNow(storedDate.dateNow), [storedDate.dateNow]);
 
-    const lastAvailable = (currentDate) => {
-        return currentDate.isSameOrAfter(yearFromNowMemo[yearFromNowMemo.length - 1])
+    const lastAvailable = (selectedDate) => {
+        return selectedDate.isSameOrAfter(yearFromNowMemo[yearFromNowMemo.length - 1])
     }
 
-    const firstAvailable = (selectedDate) => {
-        return selectedDate.isSameOrBefore(currentDate.dateNow) || selectedDate.isSame(currentDate.dateNow, 'month');
+    const firstAvailableStart = (selectedDate) => {
+        return selectedDate.isSameOrBefore(storedDate.dateNow) || selectedDate.isSame(storedDate.dateNow, 'month');
     }
 
     const firstAvailableFinish = (finish, start) => {
-        return isBeforeOrSameDate(finish, start) || finish.isSame(start, 'month');
+        return isBeforeOrSameDate(finish, start) ||
+            finish.isSame(start, 'month') ||
+            (storedDate.finalStartDate && isLastDayOfMonth(storedDate.finalStartDate)
+                && subtractMonth(storedDate.finishDate).isSame(storedDate.startDate));
     };
 
     useEffect(() => {
-        const getDaysNumbers = (selectedDate) => {
-            let daysInMonth = moment(selectedDate).daysInMonth();
-            const arrDays = [];
-            for (let i = 1; i < daysInMonth + 1; i++) {
-                const current = moment(selectedDate).date(i);
-                arrDays.push(current);
-            }
-            return arrDays;
-        }
-        setDays(getDaysNumbers(currentDate.startDate));
-        setDaysFinish(getDaysNumbers(currentDate.finishDate));
-    }, [currentDate]);
+        setDays(getDaysNumbers(storedDate.startDate));
+        setDaysFinish(getDaysNumbers(storedDate.finishDate));
+    }, [storedDate]);
 
     useEffect(() => {
-        if (currentDate.startDate.isAfter(currentDate.finishDate)) {
-            dispatch(dateActions.setFinishDate(currentDate.startDate));
+        if (storedDate.startDate.isAfter(storedDate.finishDate)) {
+            dispatch(dateActions.setFinishDate(storedDate.startDate));
         }
-    });
-
+        if (storedDate.finalStartDate && isLastDayOfMonth(storedDate.finalStartDate) && storedDate.finishDate.isSame(storedDate.startDate, 'months')) {
+            dispatch(dateActions.setFinishDate(addMonth(storedDate.startDate)));
+        }
+    })
 
     useEffect(() => {
-        if (currentDate.finalFinishDate && currentDate.finalStartDate && currentDate.finalStartDate.isSameOrAfter(currentDate.finalFinishDate)) {
+        if (storedDate.finalFinishDate
+            && storedDate.finalStartDate
+            && storedDate.finalStartDate.isSameOrAfter(storedDate.finalFinishDate)) {
             dispatch(dateActions.deleteFinishDate());
         }
     });
-
 
     const handleOpenMonthsPicker = () => {
         setShowDropdown(prev => !prev);
@@ -68,17 +68,17 @@ export const Calendar = (props) => {
 
     const handleClickBack = () => {
         if (props.initial) {
-            dispatch(dateActions.setStartDate(subtractMonth(currentDate.startDate)));
+            dispatch(dateActions.setStartDate(subtractMonth(storedDate.startDate)));
         } else {
-            dispatch(dateActions.setFinishDate(subtractMonth(currentDate.finishDate)));
+            dispatch(dateActions.setFinishDate(subtractMonth(storedDate.finishDate)));
         }
     };
 
     const handleClickForward = () => {
         if (props.initial) {
-            dispatch(dateActions.setStartDate(addMonth(currentDate.startDate)));
+            dispatch(dateActions.setStartDate(addMonth(storedDate.startDate)));
         } else {
-            dispatch(dateActions.setFinishDate(addMonth(currentDate.finishDate)));
+            dispatch(dateActions.setFinishDate(addMonth(storedDate.finishDate)));
         }
     };
 
@@ -92,14 +92,14 @@ export const Calendar = (props) => {
 
     const handleChooseDate = (date) => {
         if (props.initial) {
-            if (date.isSame(currentDate.finalStartDate)) {
+            if (date.isSame(storedDate.finalStartDate)) {
                 dispatch(dateActions.deleteStartDate());
                 dispatch(dateActions.deleteFinishDate());
                 return;
             }
             dispatch(dateActions.setFinalStartDate(date));
         } else {
-            if (date.isSame(currentDate.finalFinishDate)) {
+            if (date.isSame(storedDate.finalFinishDate)) {
                 dispatch(dateActions.deleteFinishDate());
                 return;
             }
@@ -118,20 +118,20 @@ export const Calendar = (props) => {
 
                     {props.initial ?
                         <button type="button"
-                                disabled={firstAvailable(currentDate.startDate)}
+                                disabled={firstAvailableStart(storedDate.startDate)}
                                 className={`${styles.rightArrowBtn}`}
                                 onClick={handleClickBack}>
                             <div
-                                className={firstAvailable(currentDate.startDate) ?
+                                className={firstAvailableStart(storedDate.startDate) ?
                                     `${styles.arrowIcon} ${styles.arrowIconDisabled}` : `${styles.arrowIcon}`}/>
                         </button>
                         :
                         <button type="button"
-                                disabled={firstAvailableFinish(currentDate.finishDate, currentDate.startDate)}
+                                disabled={firstAvailableFinish(storedDate.finishDate, storedDate.startDate)}
                                 className={`${styles.rightArrowBtn}`}
                                 onClick={handleClickBack}>
                             <div
-                                className={firstAvailableFinish(currentDate.finishDate, currentDate.startDate) ?
+                                className={firstAvailableFinish(storedDate.finishDate, storedDate.startDate) ?
                                     `${styles.arrowIcon} ${styles.arrowIconDisabled}` : `${styles.arrowIcon}`}/>
                         </button>
                     }
@@ -140,9 +140,9 @@ export const Calendar = (props) => {
                     <div className={styles.pickerInputContainer} onClick={handleOpenMonthsPicker}>
                         <input readOnly className={styles.pickerInput} type="text"
                                value={props.initial ?
-                                   currentDate.startDate.format(`MMMM YYYY`) :
-                                   currentDate.finishDate.format(`MMMM YYYY`)
-                               }/>
+                                   storedDate.startDate.format(`MMMM YYYY`) :
+                                   storedDate.finishDate.format(`MMMM YYYY`)}
+                        />
                         <span className={styles.dropdownIcon}/>
 
                         {showDropdown &&
@@ -153,14 +153,14 @@ export const Calendar = (props) => {
                                                className={`${styles.pickerInput} ${styles.pickerInputDropdown}`}
                                                type="text"
                                                value={props.initial ?
-                                                   currentDate.startDate.format(`MMMM YYYY`) :
-                                                   currentDate.finishDate.format(`MMMM YYYY`)}
+                                                   storedDate.startDate.format(`MMMM YYYY`) :
+                                                   storedDate.finishDate.format(`MMMM YYYY`)}
                                         />
                                         <span className={`${styles.dropdownIcon} ${styles.dropdownIconUp}`}/>
                                     </div>
                                     <div className={styles.dropdownListContainer}>
                                         {
-                                            yearFromNow(currentDate.dateNow).map(month => (
+                                            yearFromNow(storedDate.dateNow).map(month => (
                                                 props.initial ?
                                                     <button key={month.format(`MMMM YYYY`)}
                                                             type='button'
@@ -170,7 +170,8 @@ export const Calendar = (props) => {
                                                     :
                                                     <button key={month.format(`MMMM YYYY`)}
                                                             type='button'
-                                                            disabled={month.isBefore(currentDate.startDate)}
+                                                            disabled={month.isBefore(storedDate.startDate) ||
+                                                                (isLastDayOfMonth(storedDate.finalStartDate) && storedDate.finalStartDate.isSame(month, 'month'))}
                                                             onClick={() => handleChooseMonth(month)}
                                                             className={styles.dropdownItem}>{month.format(`MMMM YYYY`)}
                                                     </button>
@@ -184,21 +185,19 @@ export const Calendar = (props) => {
 
                     {props.initial ?
                         <button type="button"
-                                disabled={lastAvailable(currentDate.startDate)}
+                                disabled={lastAvailable(storedDate.startDate)}
                                 className={`${styles.leftArrowBtn} ${styles.rightArrowBtn}`}
-                                onClick={handleClickForward}
-                        >
+                                onClick={handleClickForward}>
                             <div
-                                className={lastAvailable(currentDate.startDate) ?
+                                className={lastAvailable(storedDate.startDate) ?
                                     `${styles.arrowIcon} ${styles.arrowIconDisabled}` : `${styles.arrowIcon}`}/>
                         </button> :
                         <button type="button"
-                                disabled={lastAvailable(currentDate.finishDate)}
+                                disabled={lastAvailable(storedDate.finishDate)}
                                 className={`${styles.leftArrowBtn} ${styles.rightArrowBtn}`}
-                                onClick={handleClickForward}
-                        >
+                                onClick={handleClickForward}>
                             <div
-                                className={lastAvailable(currentDate.finishDate) ?
+                                className={lastAvailable(storedDate.finishDate) ?
                                     `${styles.arrowIcon} ${styles.arrowIconDisabled}` : `${styles.arrowIcon}`}/>
                         </button>
                     }
@@ -219,19 +218,17 @@ export const Calendar = (props) => {
                                 props.initial ? days.map((date, index) => (
                                         <div
                                             key={date.format('DDDD')}
-                                            style={index === 0 ? gridFirstDay(date) : undefined}
-                                        >
-                                            {date.isSame(currentDate.finalStartDate) ?
+                                            style={index === 0 ? gridFirstDay(date) : undefined}>
+                                            {date.isSame(storedDate.finalStartDate) ?
                                                 <div
                                                     className={`${styles.dayEl} ${styles.dayElSelected}`}
-                                                    onClick={() => handleChooseDate(date)}
-                                                >
+                                                    onClick={() => handleChooseDate(date)}>
                                                     {date.format('D')}
                                                 </div>
                                                 :
                                                 <div
                                                     className={
-                                                        moment(date).isBefore(currentDate.dateNow) ?
+                                                        moment(date).isBefore(storedDate.dateNow) ?
                                                             `${styles.dayEl} ${styles.dayElDisabled}` :
                                                             `${styles.dayEl} ${styles.dayElAvailable}`
                                                     }
@@ -244,19 +241,18 @@ export const Calendar = (props) => {
                                     : daysFinish.map((date, index) => (
                                         <div
                                             key={date.format('DDDD')}
-                                            style={index === 0 ? gridFirstDay(date) : undefined}
-                                        >
-                                            {date.isSame(currentDate.finalFinishDate) ?
+                                            style={index === 0 ? gridFirstDay(date) : undefined}>
+
+                                            {date.isSame(storedDate.finalFinishDate) ?
                                                 <div
                                                     className={`${styles.dayEl} ${styles.dayElSelected}`}
-                                                    onClick={() => handleChooseDate(date)}
-                                                >
+                                                    onClick={() => handleChooseDate(date)}>
                                                     {date.format('D')}
                                                 </div>
                                                 :
                                                 <div
                                                     className={
-                                                        (moment(date).isSameOrBefore(currentDate.finalStartDate) || !currentDate.finalStartDate) ?
+                                                        (moment(date).isSameOrBefore(storedDate.finalStartDate) || !storedDate.finalStartDate) ?
                                                             `${styles.dayEl} ${styles.dayElDisabled}` :
                                                             `${styles.dayEl} ${styles.dayElAvailable}`
                                                     }
